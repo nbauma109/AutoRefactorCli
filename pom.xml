@@ -38,6 +38,7 @@
     <module>plugin</module>
     <module>plugin.tests</module>
     <module>plugin.ui</module>
+    <module>cli</module>
     <module>repository</module>
     <module>samples</module>
   </modules>

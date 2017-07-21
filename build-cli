@@ -10,8 +10,8 @@
 DIR=`dirname $0`
 
 cd "$DIR"
-#mvn clean package
-mvn package
+mvn clean package
+#mvn package
 rm -rf cli/target/autorefactor
 mkdir -p cli/target/autorefactor/bin cli/target/autorefactor/dropins/plugins
 #cp ./plugin/target/org.autorefactor.plugin-1.1.0-SNAPSHOT.jar ./plugin.ui/target/org.autorefactor.plugin.ui-1.1.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-1.1.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins

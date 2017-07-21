@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.autorefactor.cli
+Bundle-SymbolicName: org.autorefactor.cli;singleton:=true
+Bundle-Version: 1.1.0.qualifier
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core;bundle-version="3.7.1",
+ org.eclipse.text;bundle-version="3.5.101",
+ org.eclipse.core.filebuffers;bundle-version="3.5.200"
+xBundle-ActivationPolicy: lazy
+Comment1: Need to follow Eclipse's supported JRE unless dictated by
+Comment2: functionalities required from Eclipse or JRE.
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.eclipse.jdt.ui.wizards,
+ org.eclipse.ui,org.autorefactor.refactoring,
+ org.autorefactor.refactoring.rules,
+ org.autorefactor.environment,
+ org.autorefactor.util
+Bundle-ClassPath: lib/jcommander-1.72.jar,
+ .

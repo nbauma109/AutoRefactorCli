@@ -38,6 +38,7 @@
     <module>plugin</module>
     <module>plugin.tests</module>
     <module>plugin.ui</module>
+    <module>cli</module>
     <module>repository</module>
     <module>samples</module>
   </modules>
@@ -194,7 +195,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
     <profile>
       <id>checkstyle</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <build>
         <plugins>

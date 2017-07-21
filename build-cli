@@ -1,0 +1,23 @@
+#!/bin/sh -e
+
+#
+# build raw autorefactor command line installation in cli/target/autorefactor
+# 
+# for help run:
+#     cli/target/autorefactor/bin/autorefactor --help
+#
+
+DIR=`dirname $0`
+
+cd "$DIR"
+mvn clean package
+#mvn package
+rm -rf cli/target/autorefactor
+mkdir -p cli/target/autorefactor/bin cli/target/autorefactor/dropins/plugins
+#cp ./plugin/target/org.autorefactor.plugin-1.1.0-SNAPSHOT.jar ./plugin.ui/target/org.autorefactor.plugin.ui-1.1.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-1.1.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
+cp ./plugin/target/org.autorefactor.plugin-1.1.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-1.1.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
+cp ${DIR}/cli/src/main/resources/autorefactor.sh cli/target/autorefactor/bin/autorefactor
+chmod +x cli/target/autorefactor/bin/autorefactor
+echo 
+echo "Start with"
+echo "    $DIR/cli/target/autorefactor/bin/autorefactor --help"

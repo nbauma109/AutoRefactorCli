@@ -268,9 +268,12 @@
     <module name="EmptyStatement" />
     <module name="EqualsHashCode" />    
     <module name="IllegalInstantiation" />
+<!--
+    removed with checkstyle 6.2
     <module name="RedundantThrows">
       <property name="allowSubclasses" value="true" />
     </module>
+-->
     <module name="SimplifyBooleanExpression" />
     <module name="SimplifyBooleanReturn" />
     

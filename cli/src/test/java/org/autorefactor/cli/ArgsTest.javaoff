@@ -1,0 +1,27 @@
+package org.autorefactor.cli;
+
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+
+import org.junit.Test;
+
+import com.beust.jcommander.JCommander;
+
+public class ArgsTest {
+
+	@Test
+	public void testArgs() {
+		Args args = new Args();
+		JCommander.newBuilder()
+		  .addObject(args)
+		  .build()
+		  .parse(AutoRefactor.DEFAULT_ARGS);
+		
+		assertTrue(args.isVerbose());
+		assertEquals("/home/cal/xxx/.project", args.getProjectPath());
+		assertEquals(Arrays.asList("LIBS_DIR=/home/cal/yyy/repository"), args.getClassPathVariables());
+		assertEquals(Arrays.asList("src/main/java", "src/test/java"), args.getSources());
+	}
+
+}

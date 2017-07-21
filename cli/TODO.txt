@@ -1,0 +1,5 @@
+- make proper dependency to JCommander instead of binary copy
+- reduce eclipse startup messages
+- use project encoding for files instead of system encoding
+
+- a lot more ...

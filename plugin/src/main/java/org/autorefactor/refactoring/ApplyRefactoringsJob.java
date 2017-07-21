@@ -179,6 +179,7 @@ public class ApplyRefactoringsJob extends Job {
      * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
      * @param options the Java project options used to compile the project
      * @param monitor the progress monitor of the current job
+     * @return true, if changes were applied
      * @throws Exception if any problem occurs
      *
      * @see <a
@@ -192,8 +193,10 @@ public class ApplyRefactoringsJob extends Job {
      * href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
      * >Abstract Syntax Tree > Write it down</a>
      */
-    public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
+    public boolean applyRefactoring(IDocument document, ICompilationUnit compilationUnit,
+            AggregateASTVisitor refactoring,
             JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
+        boolean changed = false;
         // creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
         resetParser(compilationUnit, parser, options);
@@ -224,8 +227,9 @@ public class ApplyRefactoringsJob extends Job {
             if (!refactorings.hasRefactorings()) {
                 // no new refactorings have been applied,
                 // we are done with applying the refactorings.
-                return;
+                return changed;
             }
+            changed = true;
 
             // apply the refactorings and save the compilation unit
             refactorings.applyTo(document);
@@ -259,6 +263,7 @@ public class ApplyRefactoringsJob extends Job {
                 ++nbLoopsWithSameVisitors;
             }
         }
+        return changed;
     }
 
     private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {

@@ -38,6 +38,10 @@ Usage: autorefactor [options] [command] [command options]
             Default: []
         * --project
             Path to project file.
+        * --refactorings
+            Comma separated list of refactorings (e.g. 
+            UseDiamondOperatorRefactoring). 
+            Default: []
           --source
             Source directories to use. (e.g. src/main/java).
             Default: []

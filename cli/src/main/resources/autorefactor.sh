@@ -8,7 +8,7 @@ DIR=`dirname $0`
 BASE_DIR=`dirname "$DIR"`
 BASE_DIR=`cd "$BASE_DIR"; pwd`
 
-AUTOREFACTOR_ECLIPSE=eclipse-neon-plugin-dev
+[ "$AUTOREFACTOR_ECLIPSE" = "" ] && AUTOREFACTOR_ECLIPSE=eclipse
 
 WORKSPACE_DIR=`mktemp --tmpdir -d workspaceXXXXXX`
 trap "{ [ -n \"$WORKSPACE_DIR\" ] && rm -rf \"$WORKSPACE_DIR\"; }" EXIT

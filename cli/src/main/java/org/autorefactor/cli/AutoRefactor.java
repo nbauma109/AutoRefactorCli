@@ -37,7 +37,6 @@ import org.autorefactor.refactoring.rules.AddBracketsToControlStatementRefactori
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.AllRefactoringRules;
 import org.autorefactor.refactoring.rules.AnnotationRefactoring;
-import org.autorefactor.refactoring.rules.BigDecimalRefactoring;
 import org.autorefactor.refactoring.rules.CollapseIfStatementRefactoring;
 import org.autorefactor.refactoring.rules.CollectionContainsRefactoring;
 import org.autorefactor.refactoring.rules.CommentsRefactoring;
@@ -58,14 +57,15 @@ import org.autorefactor.refactoring.rules.RemoveUnneededThisExpressionRefactorin
 import org.autorefactor.refactoring.rules.RemoveUselessNullCheckRefactoring;
 import org.autorefactor.refactoring.rules.SetRatherThanMapRefactoring;
 import org.autorefactor.refactoring.rules.StringBuilderRefactoring;
-import org.autorefactor.refactoring.rules.StringRefactoring;
 import org.autorefactor.refactoring.rules.TestNGAssertRefactoring;
+import org.autorefactor.refactoring.rules.TestRenameRefactoring;
 import org.autorefactor.refactoring.rules.TryWithResourceRefactoring;
 import org.autorefactor.refactoring.rules.UseDiamondOperatorRefactoring;
 import org.autorefactor.refactoring.rules.UseMultiCatchRefactoring;
 import org.autorefactor.refactoring.rules.UseStringContainsRefactoring;
 import org.autorefactor.refactoring.rules.VectorOldToNewAPIRefactoring;
 import org.autorefactor.refactoring.rules.WorkWithNullCheckedExpressionFirstRefactoring;
+import org.autorefactor.util.Pair;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -81,6 +81,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -169,8 +170,11 @@ public class AutoRefactor implements IApplication {
         final ApplyArgs applyArgs = new ApplyArgs();
         final ListArgs listArgs = new ListArgs();
         final EclipseArgs eclipseArgs = new EclipseArgs();
-        final JCommander argParser = JCommander.newBuilder().addObject(args).addCommand("list", listArgs)
-                .addCommand("apply", applyArgs).addCommand("eclipse", eclipseArgs).build();
+        final JCommander argParser = JCommander.newBuilder().addObject(args)
+                .addCommand("list", listArgs)
+                .addCommand("apply", applyArgs)
+                .addCommand("eclipse", eclipseArgs)
+                .build();
         argParser.setProgramName("autorefactor");
         try {
             argParser.parse(argv);
@@ -216,7 +220,7 @@ public class AutoRefactor implements IApplication {
                         applyArgs.getDeltaDebugTestCodePattern(),
                         applyArgs.getDeltaDebugTestCodeCommand(),
                         verboseApply, applyArgs.isDeltaDebug());
-                refactorProject(new File(projectFile), sourceFolders, classPathVariables, 
+                refactorProject(new File(projectFile), sourceFolders, classPathVariables,
                 		applyArgs.getRefactorings(),
                 		applyArgs.getExcludedRefactorings(),
                 		effArgs);
@@ -226,11 +230,7 @@ public class AutoRefactor implements IApplication {
         } else if ("list".equals(cmd)) {
             listRefactorings();
         } else if ("eclipse".equals(cmd)) {
-            EffApplyArgs effArgs = new EffApplyArgs(null,
-                    null, null, null, null, null, null,
-                    verbose || eclipseArgs.isVerbose(),
-                    false);
-            refactorProject(new File(eclipseArgs.getProjectPath()), null, null, null, null, effArgs);
+            printEclipseInfo(new File(eclipseArgs.getProjectPath()), null, verbose || eclipseArgs.isVerbose());
         } else {
             argParser.usage();
         }
@@ -268,10 +268,61 @@ public class AutoRefactor implements IApplication {
     }
 
     private void refactorProject(final File projectFile, final List<String> originalSourceFolders,
-            final Map<String, String> classPathVariables, List<String> refactorings, List<String> excludedRefactorings, final EffApplyArgs args)
-            throws JavaModelException, CoreException {
+            final Map<String, String> classPathVariables, List<String> refactorings, List<String> excludedRefactorings,
+            final EffApplyArgs args)
+                    throws JavaModelException, CoreException {
         final boolean verbose = args.verbose;
+        final Pair<IWorkspace, IProject> projectCtx = prepareProject(projectFile, classPathVariables, verbose);
+        final IWorkspace workspace = projectCtx.getFirst();
+        final IProject project = projectCtx.getSecond();
 
+        final IJavaProject javaProject = JavaCore.create(project);
+        List<String> sourceFolders = new ArrayList<String>(originalSourceFolders);
+        if (sourceFolders.isEmpty()) {
+            sourceFolders.addAll(allProjectSourceFolders(javaProject));
+        }
+
+        if (verbose) {
+            System.out.println("refactor: starting refactoring");
+            System.out.println("refactor: source folders: " + sourceFolders);
+        }
+        final List<RefactoringRule> rules = selectRules(javaProject, refactorings, excludedRefactorings, args.sourceLevel);
+        if (verbose) {
+            System.out.println("refactor: rules: " + rules);
+        }
+        try {
+            for (String src : sourceFolders) {
+                final IFolder sourceFolder = project.getFolder(src);
+                refactor(javaProject, sourceFolder, rules, args);
+                //refactor(javaProject, sourceFolder, Pattern.compile(".*SpacePreparator.*"), rules, verbose);
+                //refactor(javaProject, sourceFolder, Pattern.compile(".*TextEditsBuilder.*"), rules, verbose);
+                //refactor(javaProject, sourceFolder, Pattern.compile(".*CharOperation.*"), rules, verbose);
+                //refactor(javaProject, sourceFolder, Pattern.compile(".*FieldDeclaration.*"), rules, verbose);
+                //refactor(javaProject, sourceFolder, Pattern.compile(".*ProblemReporter.*"), rules, verbose);
+            }
+        } finally {
+            javaProject.save(null, true);
+            javaProject.close();
+            workspace.save(true, null);
+        }
+    }
+
+    private void printEclipseInfo(final File projectFile,
+            final Map<String, String> classPathVariables,
+            boolean verbose)
+                    throws JavaModelException, CoreException {
+        final Pair<IWorkspace, IProject> projectCtx = prepareProject(projectFile, classPathVariables, verbose);
+        final IWorkspace workspace = projectCtx.getFirst();
+
+        IWorkspaceRoot wsroot = workspace.getRoot();
+        for (IProject p : wsroot.getProjects()) {
+            printProjectDetails(p);
+        }
+    }
+
+    private Pair<IWorkspace, IProject> prepareProject(final File projectFile,
+            final Map<String, String> classPathVariables, final boolean verbose)
+            throws CoreException, JavaModelException {
         if (!projectFile.exists()) {
             System.err.println("cannot access project file: " + projectFile.getAbsolutePath());
             throw new CoreException(new Status(0, "", "cannot access project file: " + projectFile.getAbsolutePath()));
@@ -300,39 +351,7 @@ public class AutoRefactor implements IApplication {
         }
         project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
-        if (originalSourceFolders != null) {
-            final IJavaProject javaProject = JavaCore.create(project);
-            List<String> sourceFolders = new ArrayList<String>(originalSourceFolders);
-            if (sourceFolders.isEmpty()) {
-                sourceFolders.addAll(allProjectSourceFolders(javaProject));
-            }
-
-            if (verbose) {
-                System.out.println("refactor: starting refactoring");
-                System.out.println("refactor: source folders: " + sourceFolders);
-            }
-            final List<RefactoringRule> rules = selectRules(javaProject, refactorings, excludedRefactorings, args.sourceLevel);
-            try {
-                for (String src : sourceFolders) {
-                    final IFolder sourceFolder = project.getFolder(src);
-                    refactor(javaProject, sourceFolder, rules, args);
-                    //refactor(javaProject, sourceFolder, Pattern.compile(".*SpacePreparator.*"), rules, verbose);
-                    //refactor(javaProject, sourceFolder, Pattern.compile(".*TextEditsBuilder.*"), rules, verbose);
-                    //refactor(javaProject, sourceFolder, Pattern.compile(".*CharOperation.*"), rules, verbose);
-                    //refactor(javaProject, sourceFolder, Pattern.compile(".*FieldDeclaration.*"), rules, verbose);
-                    //refactor(javaProject, sourceFolder, Pattern.compile(".*ProblemReporter.*"), rules, verbose);
-                }
-            } finally {
-                javaProject.save(null, true);
-                javaProject.close();
-                workspace.save(true, null);
-            }
-        } else {
-            IWorkspaceRoot wsroot = workspace.getRoot();
-            for (IProject p : wsroot.getProjects()) {
-                printProjectDetails(p);
-            }
-        }
+        return Pair.of(workspace, project);
     }
 
     private void disableAutoBuild(final IWorkspace workspace) throws CoreException {
@@ -376,7 +395,7 @@ public class AutoRefactor implements IApplication {
             "CollectionObject.java",
             // some buggy refactoring in "all"
             "LicenseCheck.java", "AutoDoc.java"));
-    
+
     private static class Target {
     	private final IPackageFragmentRoot packageFragmentRoot;
     	private final IResource resource;
@@ -397,13 +416,13 @@ public class AutoRefactor implements IApplication {
 			return relativePath;
 		}
     }
-    
+
     private void refactor(final IJavaProject project, final IFolder sourceFolder,
             final List<RefactoringRule> rules, final EffApplyArgs args) throws CoreException {
         final boolean verbose = args.verbose;
         final IPackageFragmentRoot pfr = project.getPackageFragmentRoot(sourceFolder);
         walkMax(sourceFolder, 1000000, new IResourceVisitor() {
-            /** @Override */
+            @Override
             public boolean visit(IResource resource) throws CoreException {
                 try {
                     if ("java".equals(resource.getFileExtension())) {
@@ -512,7 +531,7 @@ public class AutoRefactor implements IApplication {
      *
      * @param refactorings
      *            the refactorings argument
-     * @param excludedRefactorings 
+     * @param excludedRefactorings
      * @param sourceLevel source level
      *
      * @return List of selected rules
@@ -537,8 +556,10 @@ public class AutoRefactor implements IApplication {
             }
             rules.add(rule);
         }
-        System.out.println("exclude refactorings: " + excludedRefactorings);
-        rules.removeAll(excludedRefactorings);
+        if (!excludedRefactorings.isEmpty()) {
+            System.out.println("exclude refactorings: " + excludedRefactorings);
+            rules.removeAll(excludedRefactorings);
+        }
         Iterator<RefactoringRule> it = rules.iterator();
         while (it.hasNext()) {
             final RefactoringRule rule = it.next();
@@ -602,7 +623,7 @@ public class AutoRefactor implements IApplication {
                 // cal: Maybe
                 // https://github.com/JnRouvignac/AutoRefactor/issues/168 -
                 // closed
-                new StringRefactoring(), new BigDecimalRefactoring(),
+                //new StringRefactoring(), new BigDecimalRefactoring(),
                 // TODO JNR implement
                 // new ForeachRefactoring(),
                 // cal: https://github.com/JnRouvignac/AutoRefactor/issues/159
@@ -734,7 +755,7 @@ public class AutoRefactor implements IApplication {
     private IPath relativePath(final IFolder f, IResource resource) {
         return resource.getFullPath().removeFirstSegments(f.getFullPath().segmentCount());
     }
-	
+
 	public interface TargetTest {
 		Result apply(String code);
 	}
@@ -763,12 +784,12 @@ public class AutoRefactor implements IApplication {
 				@Override
 				public Result apply(String code) {
 					return testRefactorFile(code, target, rules, args);
-	            }        	
+	            }
 	        };
 
             String code = originalCode;
-			code = reduceWhitespace(code, test);            
-			code = splitLines(code, test);            
+			code = reduceWhitespace(code, test);
+			code = splitLines(code, test);
 
 			String previousCode = "";
             while(!code.equals(previousCode)) {
@@ -786,8 +807,8 @@ public class AutoRefactor implements IApplication {
                 // 3. reduce characters
                 code = reduceCharacters(code, target, test);
                 if (code.equals(previousCode)) {
-        			code = reduceWhitespace(code, test);            
-        			code = splitLines(code, test);            
+        			code = reduceWhitespace(code, test);
+        			code = splitLines(code, test);
                     code = tryReplacements(code, target, test);
                 }
             }
@@ -905,7 +926,7 @@ public class AutoRefactor implements IApplication {
 		        });
 		return joinChars(reducedChars);
 	}
-	
+
 	private static class Replace {
 		final int start;
 		final int end;
@@ -933,7 +954,7 @@ public class AutoRefactor implements IApplication {
 	// Note: matches more .... does not match function names (followed by "(")
 	private static Pattern name = Pattern.compile("(?<![A-Za-z0-9_\"])(?!\\s*\\()[a-z_][a-zA-Z_0-9]{2,}");
 
-	// null, true, false, ... 
+	// null, true, false, ...
 	private static Pattern ignore = Pattern.compile("(if|return|while|do|true|false|null)");
 
     // TODO: needs ddmax!
@@ -1119,8 +1140,8 @@ public class AutoRefactor implements IApplication {
     	}
 	}
 
-	private void refactorFile(Target target, final List<RefactoringRule> rules) throws CoreException, Exception {
-		final IResource resource = target.getResource();
+    private void refactorFile(Target target, final List<RefactoringRule> rules) throws CoreException, Exception {
+        final IResource resource = target.getResource();
         final String code = read(resource);
         final boolean didRefactor = refactorSourceCode(code, target, rules);
         if (didRefactor) {
@@ -1133,7 +1154,7 @@ public class AutoRefactor implements IApplication {
      *  http://www.programcreek.com/2014/01/how-to-resolve-bindings-when-using-eclipse-jdt-astparser/
      */
     /**
-     *  @param target 
+     *  @param target
      * @return didRefactor
      */
     private boolean refactorSourceCode(String code, Target target, final List<RefactoringRule> rules) throws Exception {
@@ -1141,30 +1162,24 @@ public class AutoRefactor implements IApplication {
         final String name = target.getResource().getName();
         //root.createPackageFragment(packageName, true, null);
         IPackageFragment pf = target.getPackageFragmentRoot().getPackageFragment(packageName(target.getRelativePath()));
-        ASTParser parser = ASTParser.newParser(AST.JLS4);
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-        // https://stackoverflow.com/questions/2017945/bindings-not-resolving-with-ast-processing-in-eclipse
-        parser.setProject(target.getPackageFragmentRoot().getJavaProject());
-        // TODO: compute?!?
-        final String unitName = "/formatter/" + target.getRelativePath().toString();
-        //final String unitName = relativePath.toString();
-        parser.setUnitName(unitName);
-        parser.setSource(code.toCharArray());
-
-        parser.setResolveBindings(true);
-        parser.setBindingsRecovery(false);
-        CompilationUnit dcu = (org.eclipse.jdt.core.dom.CompilationUnit) parser.createAST(null);
+        /*
+        CompilationUnit dcu = parseCompilationUnit(code, target);
+        
+        if (rules.size() == 1 && rules.get(0).getClass().getName().equals(TestRenameRefactoring.class.getName())) {
+        	
+        }
 
         // TODO: ddmin only
         IProblem[] problems = dcu.getProblems();
-        //System.out.println("refactorSourceCode: " + name + " (" + unitName + "), #problems: " + problems.length);
+        // TODO verbose
+        //System.out.println("refactorSourceCode: " + name + " (" + target.relativePath + "), #problems: " + problems.length);
         int i = 0;
         boolean error = false;
         for(IProblem problem : problems) {
             error |= problem.isError();
             i++;
-            if (i <= 1) {
-                //System.out.println("refactorSourceCode: problem: " + problem.getMessage() + problem.getSourceStart());
+            if (i <= 1 || problem.isError()) {
+                System.out.println("refactorSourceCode: problem: " + problem.getMessage() + ":" + problem.getSourceStart());
             }
             if (i == 1) {
                 //System.out.println("    ...");
@@ -1182,7 +1197,7 @@ public class AutoRefactor implements IApplication {
         // Maybe others, too, like EnumDeclaration, AnnotationDeclaration
         //TypeDeclaration typeDeclaration = (TypeDeclaration)dcu.types().get(0);
         //if (typeDeclaration.getAST().hasResolvedBindings()SuperclassType().)
-
+*/
         final IPackageFragment packageFragment = pf; //JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
         final ICompilationUnit cu = packageFragment.createCompilationUnit(
                 name, code, true, null);
@@ -1198,7 +1213,24 @@ public class AutoRefactor implements IApplication {
                 doc, cu, new AggregateASTVisitor(rules),
                 // newJavaProjectOptions(Release.javaSE("1.5.0"),
                 // 4));
-                newJavaProjectOptions(Release.javaSE("1.7.0"), 4), null);
+                newJavaProjectOptions(Release.javaSE("1.7.0"), 4), SubMonitor.convert(new NullProgressMonitor()));
+    }
+
+    private CompilationUnit parseCompilationUnit(String code, Target target) {
+        ASTParser parser = ASTParser.newParser(AST.JLS8);
+        parser.setKind(ASTParser.K_COMPILATION_UNIT);
+        // https://stackoverflow.com/questions/2017945/bindings-not-resolving-with-ast-processing-in-eclipse
+        parser.setProject(target.getPackageFragmentRoot().getJavaProject());
+        // TODO: compute?!?
+        final String unitName = "/formatter/" + target.getRelativePath().toString();
+        //final String unitName = relativePath.toString();
+        parser.setUnitName(unitName);
+        parser.setSource(code.toCharArray());
+
+        parser.setResolveBindings(true);
+        parser.setBindingsRecovery(false);
+        CompilationUnit dcu = (CompilationUnit) parser.createAST(null);
+        return dcu;
     }
 
     private void refreshResource(final IResource resource) {

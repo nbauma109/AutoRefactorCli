@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 #
 # build raw autorefactor command line installation in cli/target/autorefactor
@@ -15,9 +15,16 @@ mvn clean package
 rm -rf cli/target/autorefactor
 mkdir -p cli/target/autorefactor/bin cli/target/autorefactor/dropins/plugins
 #cp ./plugin/target/org.autorefactor.plugin-1.1.0-SNAPSHOT.jar ./plugin.ui/target/org.autorefactor.plugin.ui-1.1.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-1.1.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
-cp ./plugin/target/org.autorefactor.plugin-1.1.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-1.1.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
+cp ./plugin/target/org.autorefactor.plugin-2.0.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-2.0.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
 cp ${DIR}/cli/src/main/resources/autorefactor.sh cli/target/autorefactor/bin/autorefactor
 chmod +x cli/target/autorefactor/bin/autorefactor
-echo 
-echo "Start with"
-echo "    $DIR/cli/target/autorefactor/bin/autorefactor --help"
+cat << EOD
+Start with
+
+    $DIR/cli/target/autorefactor/bin/autorefactor --help
+
+or specify eclipse instance to use instead of "eclipse" like this
+
+    AUTOREFACTOR_ECLIPSE=eclipse-neon-plugin-dev $DIR/cli/target/autorefactor/bin/autorefactor --help"
+    AUTOREFACTOR_ECLIPSE=eclipse-oxygen $DIR/cli/target/autorefactor/bin/autorefactor --help"
+EOD

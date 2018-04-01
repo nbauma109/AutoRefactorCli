@@ -1,0 +1,7 @@
+- typed exceptions for matcher syntax errors
+- do remove generated factory methods
+
+try to remove ui stuff from cli manifest.
+
+jdt compile error handling:
+https://www.eclipse.org/forums/index.php/t/485939/

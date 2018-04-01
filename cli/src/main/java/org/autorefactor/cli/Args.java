@@ -22,6 +22,9 @@ public class Args {
     @Parameter(names = { "--help", "help" }, description = "Display usage info.", help = true)
     private boolean help;
 
+    @Parameter(names = { "--experimental"}, description = "Display usage info, experimental options included.", help = true)
+    private boolean experimentalHelp;
+
     /**
      * Getter.
      *
@@ -38,5 +41,9 @@ public class Args {
      */
     public boolean isHelp() {
         return help;
+    }
+
+    public boolean isExperimentalHelp() {
+        return experimentalHelp;
     }
 }

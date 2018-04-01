@@ -18,6 +18,19 @@ public class EffApplyArgs {
     final boolean verbose;
     final boolean deltaDebug;
 
+    public EffApplyArgs(SourceLevel sourceLevel, Pattern compile, boolean verboseApply) {
+        super();
+        this.sourceLevel = sourceLevel;
+        this.sourceFileName = compile;
+        this.deltaDebugTestExceptionPattern = null;
+        this.deltaDebugBeforeTestCodePattern = null;
+        this.deltaDebugTestCodePattern = null;
+        this.deltaDebugBeforeTestCodeCommand = null;
+        this.deltaDebugTestCodeCommand = null;
+        this.verbose = verboseApply;
+        this.deltaDebug = false;
+    }
+
     public EffApplyArgs(SourceLevel sourceLevel, Pattern compile, Pattern deltaDebugTestExceptionPattern,
             Pattern deltaDebugBeforeTestCodePattern,
             String deltaDebugBeforeTestCodeCommand, 
@@ -35,5 +48,4 @@ public class EffApplyArgs {
         this.verbose = verboseApply;
         this.deltaDebug = deltaDebug;
     }
-
 }

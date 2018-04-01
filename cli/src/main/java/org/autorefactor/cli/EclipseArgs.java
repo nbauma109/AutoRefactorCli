@@ -6,8 +6,8 @@ import com.beust.jcommander.Parameters;
 /** Eclipse info printing. */
 @Parameters(commandDescription = "Print eclipse info.")
 public class EclipseArgs {
-    /** Allow late setting of verbose parameter. */
-    @Parameter(names = "--verbose", description = "Verbose mode")
+    /** Allow setting of verbose parameter after command. */
+    @Parameter(names = "--verbose", description = "Verbose mode", hidden = true)
     private boolean verbose;
 
     @Parameter(names = "--project", description = "Path to project file.", required = true)

@@ -10,6 +10,7 @@
 DIR=`dirname $0`
 
 cd "$DIR"
+#mvn --offline clean package
 mvn clean package
 #mvn package
 rm -rf cli/target/autorefactor
@@ -23,8 +24,7 @@ Start with
 
     $DIR/cli/target/autorefactor/bin/autorefactor --help
 
-or specify eclipse instance to use instead of "eclipse" like this
+or specify eclipse instance to use (default is: "eclipse")
 
-    AUTOREFACTOR_ECLIPSE=eclipse-neon-plugin-dev $DIR/cli/target/autorefactor/bin/autorefactor --help"
-    AUTOREFACTOR_ECLIPSE=eclipse-oxygen $DIR/cli/target/autorefactor/bin/autorefactor --help"
+    AUTOREFACTOR_ECLIPSE=eclipse-oxygen-vanilla $DIR/cli/target/autorefactor/bin/autorefactor --help
 EOD

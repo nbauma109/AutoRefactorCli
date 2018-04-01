@@ -1,12 +1,16 @@
 package org.autorefactor.cli;
 
+import static org.autorefactor.cli.DeltaDebugRefactor.removeLeadingWhitespace;
+import static org.autorefactor.cli.DeltaDebugRefactor.removeTrailingWhitespace;
+import static org.autorefactor.cli.DeltaDebugRefactor.splitLines;
+import static org.autorefactor.cli.DeltaDebugRefactor.tryReplacements;
 import static org.junit.Assert.*;
 
 import org.autorefactor.cli.dd.DDMin.Result;
 import org.junit.Test;
 
 public class JavaMinimizerTest {
-	private static final AutoRefactor.TargetTest REPRODUCED = new AutoRefactor.TargetTest() {
+	private static final DeltaDebugRefactor.TargetTest REPRODUCED = new DeltaDebugRefactor.TargetTest() {
 		@Override
 		public Result apply(String code) {
 			return Result.Reproduced;
@@ -20,7 +24,7 @@ public class JavaMinimizerTest {
 	}
 
 	private void doTestRemoveLeadingWhiteSpace(String expected, String in) {
-		assertEquals(expected, AutoRefactor.removeLeadingWhitespace(in));
+		assertEquals(expected, removeLeadingWhitespace(in));
 	}
 
 	@Test
@@ -30,18 +34,18 @@ public class JavaMinimizerTest {
 	}
 
 	private void doTestRemoveTrailingWhiteSpace(String expected, String in) {
-		assertEquals(expected, AutoRefactor.removeTrailingWhitespace(in));
+		assertEquals(expected, removeTrailingWhitespace(in));
 	}
 	
 	@Test
 	public void testReplacements() {
-		assertEquals("{return 1;}", AutoRefactor.tryReplacements("{return a;}", null, REPRODUCED));
-		assertEquals("{Object s =1;}", AutoRefactor.tryReplacements("{String s = \"asdf\";}", null, REPRODUCED));
-		assertEquals("a(Object...q) {}", AutoRefactor.tryReplacements("a(Object...reference) {}", null, REPRODUCED));
+		assertEquals("{return 1;}", tryReplacements("{return a;}", null, REPRODUCED));
+		assertEquals("{Object s =1;}", tryReplacements("{String s = \"asdf\";}", null, REPRODUCED));
+		assertEquals("a(Object...q) {}", tryReplacements("a(Object...reference) {}", null, REPRODUCED));
 	}
 
 	@Test
 	public void testSplitLines() {
-		assertEquals("@hello()\nworld()", AutoRefactor.splitLines("@hello()world()", REPRODUCED));
+		assertEquals("@hello()\nworld()", splitLines("@hello()world()", REPRODUCED));
 	}
 }

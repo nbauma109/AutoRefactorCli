@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.text;bundle-version="3.6.100",
  org.eclipse.core.filebuffers;bundle-version="3.5.200",
  org.eclipse.ltk.core.refactoring;bundle-version="3.8.0",
+ org.eclipse.jdt.ui;bundle-version="3.13.52",
  org.junit
 xBundle-ActivationPolicy: lazy
 Comment1: Need to follow Eclipse's supported JRE unless dictated by
@@ -19,6 +20,7 @@ Import-Package: org.autorefactor.environment,
  org.autorefactor.refactoring,
  org.autorefactor.refactoring.rules,
  org.autorefactor.util,
+ org.eclipse.jdt.internal.corext.codemanipulation,
  org.eclipse.jdt.ui.wizards,
  org.eclipse.ui
 Bundle-ClassPath: lib/jcommander-1.72.jar,

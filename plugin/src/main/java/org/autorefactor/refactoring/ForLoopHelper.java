@@ -25,27 +25,53 @@
  */
 package org.autorefactor.refactoring;
 
-import java.util.List;
+import static org.autorefactor.matcher.AstMatcher.anyOf;
+import static org.autorefactor.matcher.AstMatcher.assignment;
+import static org.autorefactor.matcher.AstMatcher.expression;
+import static org.autorefactor.matcher.AstMatcher.forStatement;
+import static org.autorefactor.matcher.AstMatcher.ignoreParentheses;
+import static org.autorefactor.matcher.AstMatcher.infixExpression;
+import static org.autorefactor.matcher.AstMatcher.isSameVariableAsBoundNode;
+import static org.autorefactor.matcher.AstMatcher.methodInvocation;
+import static org.autorefactor.matcher.AstMatcher.name;
+import static org.autorefactor.matcher.AstMatcher.postfixExpression;
+import static org.autorefactor.matcher.AstMatcher.prefixExpression;
+import static org.autorefactor.matcher.AstMatcher.qualifiedName;
+import static org.autorefactor.matcher.AstMatcher.simpleName;
+import static org.autorefactor.matcher.AstMatcher.variableDeclarationExpression;
+import static org.autorefactor.matcher.AstMatcher.variableDeclarationFragment;
+import static org.autorefactor.matcher.TypeMatcher.typeBinding;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.isArray;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.autorefactor.matcher.AstMatcher.BoundNodesBuilder;
+import org.autorefactor.matcher.AstMatcher.Matcher;
+import org.autorefactor.matcher.MatchTransformer;
+import org.autorefactor.matcher.Matchers.MethodInvocationMatcher;
 import org.autorefactor.util.Pair;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PostfixExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** Helper class for dealing with loops. */
 public final class ForLoopHelper {
+
     private ForLoopHelper() {
         super();
     }
@@ -175,12 +201,133 @@ public final class ForLoopHelper {
         }
     }
 
+    public static Matcher<Expression> sameVariableAsBoundNode(String id) {
+        return new Matcher<Expression>() {
+
+            @Override
+            public boolean match(ASTNode t, BoundNodesBuilder bounds) {
+                Object other = bounds.get(id);
+                return t != null && other != null ? isSameVariable(t, (ASTNode)other) : false;
+            }
+        };
+    }
+
+    private static final MethodInvocationMatcher ITERATOR_CALL =
+            methodInvocation()
+            .isMethod("java.util.Collection", "iterator")
+            .hasExpression(name().bind("initMiExpr"));
+
+    private static final Matcher<?> iterateOverContainerWithIterator =
+    		forStatement()
+    		.initializerCountIs(1)
+    		.hasInitializer(ignoreParentheses(
+    				anyOf(
+    						variableDeclarationExpression()
+    						.fragmentCountIs(1)
+    						.hasFragment(
+    								variableDeclarationFragment()
+    								.hasName(simpleName().bind("name"))
+    								.hasInitializer(ITERATOR_CALL)),
+    						assignment()
+    						.hasOperator(ASSIGN)
+    						.hasLeftHandSide(name().bind("name")))))
+    		.hasCondition(ignoreParentheses(
+    				methodInvocation()
+    				.isMethod("java.util.Iterator", "hasNext")
+    				.hasExpression(
+    						name()
+    						.that(isSameVariableAsBoundNode("name"))
+    						.bind("condExpr"))))
+            .updaterCountIs(0);
+
+    private static final Matcher<?> iterateOverContainerWithIncrement =
+    		forStatement()
+    		.initializerCountIs(1)
+    		.hasInitializer(ignoreParentheses(
+    				expression()
+    				.hasTypeBinding(typeBinding()
+    						.isPrimitive()
+    						.hasQualifiedName("int"))
+    				.anyOf(
+    						variableDeclarationExpression()
+    						.fragmentCountIs(1)
+    						.hasFragment(
+    								variableDeclarationFragment()
+    								.hasName(simpleName().bind("name"))
+    								.hasInitializer(
+    										expression()
+    										.hasConstantExpressionValue(Integer.class, Integer::intValue, 0))),
+    						assignment()
+    						.hasOperator(ASSIGN)
+    						.hasLeftHandSide(name().bind("name"))
+    						.hasRightHandSide(ignoreParentheses(
+    								expression()
+    								.hasConstantExpressionValue(Integer.class, Integer::intValue, 0))))))
+    		.updaterCountIs(1)
+    		.hasUpdater(ignoreParentheses(
+    				anyOf(
+    						prefixExpression()
+    						.hasIncrementOperator()
+    						.hasOperand(name().that(isSameVariableAsBoundNode("name"))),
+    						postfixExpression()
+    						.hasIncrementOperator()
+    						.hasOperand(name().that(isSameVariableAsBoundNode("name"))))))
+    		.hasCondition(ignoreParentheses(
+    				infixExpression()
+    				.extendedOperandCountIs(0)
+    				.anyOf(
+    						infixExpression()
+    						.hasOperator(LESS)
+    						.hasRightOperand(ignoreParentheses(
+    								expression()
+    								.anyOf(
+    										methodInvocation(),
+    										qualifiedName())
+    								.bind("containerVar"))),
+    						infixExpression()
+    						.hasOperator(GREATER)
+    						.hasLeftOperand(ignoreParentheses(
+    								expression()
+    								.anyOf(
+    										methodInvocation(),
+    										qualifiedName())
+    								.bind("containerVar"))))))
+    		;
+
+    // match different iterator patterns and optionally create ForLoopContent object on match
+    // TODO: make read only, create builder?
+    public static final MatchTransformer<ForLoopContent> FOR_LOOP_CONTENT_MATCHER =
+            new MatchTransformer<ForLoopContent>()
+            .addTransformer(iterateOverContainerWithIterator,
+                    // TODO: push optional down
+                    bounds -> Optional
+                    .ofNullable(
+                            ForLoopContent.iteratedCollection(
+                                    bounds.castAs("condExpr", Expression.class),
+                                    bounds.castAs("initMiExpr", Name.class))))
+            .addTransformer(iterateOverContainerWithIncrement,
+                    bounds -> Optional
+                    .ofNullable(
+                            buildForLoopContent(
+                                    bounds.castAs("name", Name.class),
+                                    bounds.castAs("containerVar", Expression.class))));
+
     /**
      * Returns the {@link ForLoopContent} if this for loop iterates over a container.
      *
      * @param node the for statement
      * @return the {@link ForLoopContent} if this for loop iterates over a container, null otherwise
      */
+    public static ForLoopContent iterateOverContainer(ForStatement node) {
+        return FOR_LOOP_CONTENT_MATCHER.matchAndTransform(node).orElse(null);
+    }
+    
+    /* *
+     * Returns the {@link ForLoopContent} if this for loop iterates over a container.
+     *
+     * @param node the for statement
+     * @return the {@link ForLoopContent} if this for loop iterates over a container, null otherwise
+     * /
     public static ForLoopContent iterateOverContainer(ForStatement node) {
         final List<Expression> initializers = initializers(node);
         final Expression condition = node.getExpression();
@@ -240,6 +387,7 @@ public final class ForLoopHelper {
         }
         return null;
     }
+*/
 
     /**
      * Decomposes an initializer into a {@link Pair} with the name of the initialized variable
@@ -267,7 +415,7 @@ public final class ForLoopHelper {
         }
         return Pair.empty();
     }
-
+/*
     private static boolean isZero(final Expression expr) {
         if (expr != null) {
             final Object val = expr.resolveConstantExpressionValue();
@@ -291,6 +439,18 @@ public final class ForLoopHelper {
         }
         return null;
     }
+
+    // TODO work in progress
+    private static final Matcher<Expression> FOR_LOOP_CONTENT =
+            expression()
+            .anyOf(
+                    methodInvocation()
+                        .hasExpression(name())
+                        .isMethod("java.util.Collection", "size"),
+                    qualifiedName()
+                        .isArrayLength());
+
+*/
 
     private static ForLoopContent buildForLoopContent(final Expression loopVar, final Expression containerVar) {
         if (!(loopVar instanceof Name)) {

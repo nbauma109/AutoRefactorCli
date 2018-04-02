@@ -11,10 +11,13 @@ BASE_DIR=`cd "$BASE_DIR"; pwd`
 [ "$AUTOREFACTOR_ECLIPSE" = "" ] && AUTOREFACTOR_ECLIPSE=eclipse
 
 WORKSPACE_DIR=`mktemp --tmpdir -d workspaceXXXXXX`
-trap "{ [ -n \"$WORKSPACE_DIR\" ] && rm -rf \"$WORKSPACE_DIR\"; }" EXIT
+#trap "{ [ -n \"$WORKSPACE_DIR\" ] && rm -rf \"$WORKSPACE_DIR\"; }" EXIT
 
 CONSOLE_LOG=""
 [ $# -gt 0 -a "$1" = "--consolelog" ] && CONSOLE_LOG="-consolelog" && shift
+
+# eclipse command line parameters:
+# https://help.eclipse.org/neon/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Freference%2Fmisc%2Fruntime-options.html
 
 args=( "$@" )
 args+=("-vmargs" "-Xmx2000m" "-Dorg.eclipse.equinox.p2.reconciler.dropins.directory=${BASE_DIR}/dropins")

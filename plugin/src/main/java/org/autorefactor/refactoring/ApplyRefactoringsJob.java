@@ -274,6 +274,7 @@ public class ApplyRefactoringsJob extends Job {
             } else {
                 ++nbLoopsWithSameVisitors;
             }
+            //break;
         }
         return changed;
     }

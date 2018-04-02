@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.autorefactor.cli.dd.DDMin;
 import org.autorefactor.cli.dd.DDMin.Result;
+import org.autorefactor.matcher.AstMatcherUtil;
 import org.autorefactor.refactoring.ApplyRefactoringsJob;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.JavaProjectOptionsImpl;
@@ -58,7 +59,6 @@ import org.autorefactor.refactoring.rules.RemoveUselessNullCheckRefactoring;
 import org.autorefactor.refactoring.rules.SetRatherThanMapRefactoring;
 import org.autorefactor.refactoring.rules.StringBuilderRefactoring;
 import org.autorefactor.refactoring.rules.TestNGAssertRefactoring;
-import org.autorefactor.refactoring.rules.TestRenameRefactoring;
 import org.autorefactor.refactoring.rules.TryWithResourceRefactoring;
 import org.autorefactor.refactoring.rules.UseDiamondOperatorRefactoring;
 import org.autorefactor.refactoring.rules.UseMultiCatchRefactoring;
@@ -170,9 +170,11 @@ public class AutoRefactor implements IApplication {
         final ApplyArgs applyArgs = new ApplyArgs();
         final ListArgs listArgs = new ListArgs();
         final EclipseArgs eclipseArgs = new EclipseArgs();
+        AstDumpArgs astDumpArgs = new AstDumpArgs();
         final JCommander argParser = JCommander.newBuilder().addObject(args)
                 .addCommand("list", listArgs)
                 .addCommand("apply", applyArgs)
+                .addCommand("ast-dump", astDumpArgs)
                 .addCommand("eclipse", eclipseArgs)
                 .build();
         argParser.setProgramName("autorefactor");
@@ -229,6 +231,9 @@ public class AutoRefactor implements IApplication {
             }
         } else if ("list".equals(cmd)) {
             listRefactorings();
+        } else if ("ast-dump".equals(cmd)) {
+            dumpAst(new File(astDumpArgs.getProjectPath()), Collections.<String>emptyList(),  Collections.<String,String>emptyMap(),
+                    astDumpArgs);
         } else if ("eclipse".equals(cmd)) {
             printEclipseInfo(new File(eclipseArgs.getProjectPath()), null, verbose || eclipseArgs.isVerbose());
         } else {
@@ -299,6 +304,36 @@ public class AutoRefactor implements IApplication {
                 //refactor(javaProject, sourceFolder, Pattern.compile(".*CharOperation.*"), rules, verbose);
                 //refactor(javaProject, sourceFolder, Pattern.compile(".*FieldDeclaration.*"), rules, verbose);
                 //refactor(javaProject, sourceFolder, Pattern.compile(".*ProblemReporter.*"), rules, verbose);
+            }
+        } finally {
+            javaProject.save(null, true);
+            javaProject.close();
+            workspace.save(true, null);
+        }
+    }
+
+    private void dumpAst(final File projectFile, final List<String> originalSourceFolders,
+            final Map<String, String> classPathVariables, final AstDumpArgs args)
+                    throws JavaModelException, CoreException {
+        final boolean verbose = args.isVerbose();
+        final Pair<IWorkspace, IProject> projectCtx = prepareProject(projectFile, classPathVariables, verbose);
+        final IWorkspace workspace = projectCtx.getFirst();
+        final IProject project = projectCtx.getSecond();
+
+        final IJavaProject javaProject = JavaCore.create(project);
+        List<String> sourceFolders = new ArrayList<String>(originalSourceFolders);
+        if (sourceFolders.isEmpty()) {
+            sourceFolders.addAll(allProjectSourceFolders(javaProject));
+        }
+
+        if (verbose) {
+            System.out.println("dumpAst: starting");
+            System.out.println("dumpAst: source folders: " + sourceFolders);
+        }
+        try {
+            for (String src : sourceFolders) {
+                final IFolder sourceFolder = project.getFolder(src);
+                dumpAst(javaProject, sourceFolder, args.getIncludePattern(), args.isVerbose());
             }
         } finally {
             javaProject.save(null, true);
@@ -450,6 +485,43 @@ public class AutoRefactor implements IApplication {
                         } else {
                             refactorFile(new Target(pfr, resource, relativePath), rules);
                         }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+        });
+    }
+
+    private void dumpAst(final IJavaProject project, final IFolder sourceFolder,
+            final Pattern filenamePattern, final boolean verbose) throws CoreException {
+        final IPackageFragmentRoot pfr = project.getPackageFragmentRoot(sourceFolder);
+        walkMax(sourceFolder, 1000000, new IResourceVisitor() {
+            @Override
+            public boolean visit(IResource resource) throws CoreException {
+                try {
+                    if ("java".equals(resource.getFileExtension())) {
+                        final String name = resource.getName();
+                        IPath relativePath = relativePath(sourceFolder, resource);
+                        if (!filenamePattern.matcher(relativePath.toString()).matches()) {
+                            if (verbose) {
+                                System.out.println("skipping " + resource.getProjectRelativePath());
+                                // System.out.println("skipping " +
+                                // resource.getRawLocationURI());
+                            }
+                            return true;
+                        }
+                        if (verbose) {
+                            System.out.println("dumping " + resource.getProjectRelativePath());
+                        }
+                        if (filesToIgnore.contains(name)) {
+                            if (verbose) {
+                                System.out.println("    ignored");
+                            }
+                            return true;
+                        }
+                        dumpAst(new Target(pfr, resource, relativePath));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1140,6 +1212,14 @@ public class AutoRefactor implements IApplication {
     	}
 	}
 
+	private void dumpAst(Target target) throws CoreException, Exception {
+	    final IResource resource = target.getResource();
+	    final String code = read(resource);
+        CompilationUnit dcu = parseCompilationUnit(code, target);
+        System.out.println(target.relativePath + ":");
+        AstMatcherUtil.dumpAst(dcu);
+	}
+
     private void refactorFile(Target target, final List<RefactoringRule> rules) throws CoreException, Exception {
         final IResource resource = target.getResource();
         final String code = read(resource);
@@ -1165,9 +1245,6 @@ public class AutoRefactor implements IApplication {
         /*
         CompilationUnit dcu = parseCompilationUnit(code, target);
         
-        if (rules.size() == 1 && rules.get(0).getClass().getName().equals(TestRenameRefactoring.class.getName())) {
-        	
-        }
 
         // TODO: ddmin only
         IProblem[] problems = dcu.getProblems();

@@ -246,6 +246,7 @@ public class ApplyRefactoringsJob extends Job {
             }
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
+            //System.out.println("<document>\n" + document.get() + "\n</document>");
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
             // compilationUnit.reconcile(AST.JLS8,
             // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |

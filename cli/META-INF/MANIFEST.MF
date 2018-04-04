@@ -23,5 +23,6 @@ Import-Package: org.autorefactor.environment,
  org.eclipse.jdt.internal.corext.codemanipulation,
  org.eclipse.jdt.ui.wizards,
  org.eclipse.ui
-Bundle-ClassPath: lib/jcommander-1.72.jar,
+Bundle-ClassPath: target/lib/jcommander.jar,
+ target/lib/groovy-all.jar,
  .

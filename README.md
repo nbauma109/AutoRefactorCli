@@ -20,9 +20,10 @@ project contains a copy of AutoRefactor currently.
 ```
 $ ./cli/target/autorefactor/bin/autorefactor --help
 ```
+
 gives
 
-````
+```
 Usage: <main class> [options] [command] [command options]
   Options:
     --consolelog
@@ -114,7 +115,6 @@ Usage: <main class> [options] [command] [command options]
         Options:
         * --project
             Path to project file.
-
 ```
 
 

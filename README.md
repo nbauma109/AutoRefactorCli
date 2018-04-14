@@ -6,8 +6,8 @@ plugin https://github.com/JnRouvignac/AutoRefactor.
 
 The plugin provides a list of refactorings for java source code.
 
-Because some minor changes to the AutoRefactor plusin are needed this
-project conatisn a copy of AutoRefactor currently.
+Because some minor changes to the AutoRefactor plugin are needed this
+project contains a copy of AutoRefactor currently.
 
 ## Build (Linux only)
 

@@ -248,6 +248,9 @@ Available refactorings:
         object is not necessary.
     EndOfMethodRatherThanReturnRefactoring - End of method rather than return (pre-configured)
         Removes useless lone return at the end of a method.
+    EntrySetRatherThanKeySetAndValueSearchRefactoring - Map.entrySet() rather than Map.keySet() and value search (pre-configured)
+        Convert for loops iterating on Map.keySet() to iterate on Map.
+        entrySet() when possible.
     EnumMapRatherThanHashMapRefactoring - EnumMap rather than HashMap for enum keys (pre-configured)
         Refactor implementation class HashMap -> EnumMap when key is a enum 
         type
@@ -299,15 +302,9 @@ Available refactorings:
     LongPrimitiveRatherThanWrapperRefactoring - Long primitive rather than wrapper (pre-configured)
         Replace Long wrapper object by long primitive type when an object is 
         not necessary.
-    MapEliminateKeySetCallsRefactoring - Replace useless calls to Map.keySet() when direct calls to the Map are possible (pre-configured)
-        Convert for loops iterating on Map.keySet() to iterate on Map.
-        entrySet() when possible.
     MapRefactoring - Inited map rather than new map and Map.putAll() (pre-configured)
         Replaces creating a new Map, then invoking Map.putAll() on it, by 
         creating the new Map with the other Map as parameter.
-    MergeBlocksWithJumpRefactoring - One block with jump rather than duplicate blocks (pre-configured)
-        Merge following if statements with same code block that end with a 
-        jump statement.
     MergeConditionalBlocksRefactoring - Merge conditional statements (pre-configured)
         Merge adjacent if / else if / else statements with same code block.
     MethodOnMapRatherThanMethodOnKeySetRefactoring - Method on map rather than method on keyset (pre-configured)
@@ -317,6 +314,12 @@ Available refactorings:
         Moves assignments inside an if condition before the if node.
     ORConditionRatherThanRedundantClausesRefactoring - OR condition rather than redundant clauses (pre-configured)
         Replace (X && Y) || !X by Y || !X.
+    OneCodeThatFallsThroughRatherThanRedundantBlocksRefactoring - One code that falls through rather than redundant blocks (pre-configured)
+        Merge blocks that end with a jump statement into the following same 
+        code.
+    OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring - One if rather than duplicate blocks that fall through (pre-configured)
+        Merge consecutive if statements with same code block that end with a 
+        jump statement.
     PrimitiveWrapperCreationRefactoring - Primitive wrapper creation (pre-configured)
         Replaces unnecessary primitive wrappers instance creations by using 
         static factory methods ("valueOf()") or existing constants.
@@ -428,8 +431,6 @@ Available refactorings:
         - replaces if/else if/else blocks to use switch where possible.
     TernaryOperatorRatherThanDuplicateConditionsRefactoring - Ternary operator rather than duplicate conditions (pre-configured)
         Replace (X && Y) || (!X && Z) by X ? Y : Z.
-    TestMatcherRefactoring - Test AST matcher based refactorings (pre-configured)
-        Test AST matcher based refactorings.
     TestNGAssertRefactoring - TestNG asserts (pre-configured)
         Refactors to a proper use of TestNG assertions.
     TryWithResourceRefactoring - Use try-with-resource (pre-configured)
@@ -461,6 +462,7 @@ Available refactorings:
         case in the else clause.
     XORRatherThanDuplicateConditionsRefactoring - XOR rather than duplicate conditions (pre-configured)
         Replace (X && !Y) || (!X && Y) by X ^ Y.
+```
 
 # AutoRefactor
 

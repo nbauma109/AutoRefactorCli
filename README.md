@@ -2,7 +2,7 @@
 # AutoRefactor - Command Line Interface - *Experimental*
 
 This project contains a command line interface to the great eclipse 
-plugin https://github.com/JnRouvignac/AutoReactor.
+plugin https://github.com/JnRouvignac/AutoRefactor.
 
 The plugin provides a list of refactorings for java source code.
 

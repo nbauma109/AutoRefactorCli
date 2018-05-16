@@ -9,6 +9,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
@@ -1320,7 +1321,7 @@ public abstract class AstMatcher extends PrivateAstMatcher {
             public boolean match(ASTNode t, BoundNodesBuilder bounds) {
                 Object other = bounds.get(id);
                 return t != null && other instanceof ASTNode
-                                ? ASTHelper.match(new ASTMatcher(), t, (ASTNode) other)
+                                ? ASTHelper.match(new ASTSemanticMatcher(), t, (ASTNode) other)
                                 : false;
             }
         };

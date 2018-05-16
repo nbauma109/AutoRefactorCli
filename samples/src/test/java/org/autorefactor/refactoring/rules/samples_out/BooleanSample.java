@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.List;
+
 public class BooleanSample {
 
     public boolean booleanPrimitive;
@@ -388,14 +390,74 @@ public class BooleanSample {
         aMethodThatAcceptsABoolean(Boolean.valueOf(!bo));
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression10(boolean bo) {
+    public void directlyPassBooleanPrimitiveAsParameter(boolean bo) {
         // Keep this comment
         aMethodThatAcceptsABoolean(bo);
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression11(boolean bo) {
+    public void directlyPassBooleanExpressionAsParameter(int i) {
+        // Keep this comment
+        aMethodThatAcceptsABoolean(i > 0);
+    }
+
+    public void doNotDuplicateExpression(int i) {
+        if (i > 0) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(false);
+        }
+    }
+
+    public void directlyPassInvertedBooleanPrimitiveAsParameter(boolean bo) {
         // Keep this comment
         aMethodThatAcceptsABoolean(!bo);
+    }
+
+    public int directlyPassBooleanAmongOtherCode(boolean bo) {
+        // Keep this comment
+        {
+            aMethodThatAcceptsABoolean(bo);
+            if (aMethodThatReturnsBoolean()) {
+                return 0;
+            } else {
+                return 10;
+            }
+        }
+    }
+
+    public int directlyPassBooleanAmongOtherBoolean(boolean bo, int i) {
+        // Keep this comment
+        {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(bo);
+            aMethodThatAcceptsABoolean(true);
+            i++;
+        }
+        return i;
+    }
+
+    public int directlyPassOppositeBoolean(boolean bo) {
+        // Keep this comment
+        {
+            aMethodThatAcceptsABoolean(bo);
+            aMethodThatAcceptsABoolean(!bo);
+            if (aMethodThatReturnsBoolean()) {
+                return 0;
+            } else
+                return 10;
+        }
+    }
+
+    public void doNotMoveActiveExpression(List<Integer> modifiableList) {
+        if (modifiableList.add(1)) {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(false);
+        }
     }
 
     public void removeUselessIfInBooleanPrimitiveExpression12(boolean bo) {

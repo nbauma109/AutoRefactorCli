@@ -26,34 +26,35 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class CommonCodeInIfElseStatementSample {
 
     /** common code: i++, Remove if statement */
-    public void ifElseRemoveIfNoBrackets(Boolean b, int i) {
+    public void ifElseRemoveIfNoBrackets(boolean b, int i) {
         // Keep this!
-        if (b.booleanValue())
+        if (b)
             // Keep this comment
             i++;
         else
-            i++;
+            i = i + 1;
     }
 
     /** common code: i++, Remove if statement */
-    public void ifElseRemoveIf(Boolean b, int i) {
-        if (b.booleanValue()) {
+    public void ifElseRemoveIf(boolean b, int i) {
+        if (b) {
             // Keep this comment
-            i++;
+            i = i + 1;
         } else {
             i++;
         }
     }
 
     /** no common code, Do not remove anything */
-    public void doNotRemoveNotCommonCode(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void doNotRemoveNotCommonCode(boolean b, int i, int j) {
+        if (b) {
             i++;
         } else {
             j++;
@@ -61,52 +62,32 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** common code: i++, Remove then case */
-    public void ifElseRemoveThen(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void ifElseRemoveThen(boolean b, int i, int j) {
+        if (b) {
             // Keep this comment
-            i++;
+            ++i;
         } else {
-            // Keep this comment
-            i++;
             j++;
+            // Keep this comment
+            i = i + 1;
         }
     }
 
     /** common code: i++, Remove else case */
-    public void ifElseRemoveElse(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void ifElseRemoveElse(boolean b, int i, int j) {
+        if (b) {
+            j++;
             // Keep this comment
             i++;
-            j++;
         } else {
             // Keep this comment
             i++;
-        }
-    }
-
-    /**
-     * common code: put i++ before if statement, put l++ after if statement. Do
-     * not remove if statement.
-     */
-    public void ifElseRemoveIf(Boolean b, int i, int j, int k, int l) {
-        if (b.booleanValue()) {
-            // Keep this comment
-            i++;
-            j++;
-            // Keep this comment
-            l++;
-        } else {
-            // Keep this comment
-            i++;
-            k++;
-            // Keep this comment
-            l++;
         }
     }
 
     /** only common code, Remove if statement */
-    public void ifElseRemoveIfSeveralStatements(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void ifElseRemoveIfSeveralStatements(boolean b, int i, int j) {
+        if (b) {
             // Keep this comment
             i++;
             j++;
@@ -118,23 +99,45 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** not all cases covered, Do not remove anything */
-    public void ifElseIfNoElseDoNotTouch(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void ifElseIfNoElseDoNotTouch(boolean b, int i, int j) {
+        if (b) {
             i++;
             j++;
-        } else if (!b.booleanValue()) {
+        } else if (!b) {
             i++;
             j++;
         }
     }
 
     /** only common code: remove if statement */
-    public void ifElseIfElseRemoveIf(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void ifElseIfElseRemoveIf(boolean b, int i, int j) {
+        if (b) {
             // Keep this comment
             i++;
             j++;
-        } else if (!b.booleanValue()) {
+        } else if (!b) {
+            // Keep this comment
+            i++;
+            j++;
+        } else {
+            // Keep this comment
+            i++;
+            j++;
+        }
+    }
+
+    /** specific code: keep some if statement */
+    public void ifElseIfElseRemoveSomeIf(boolean b1, boolean b2, List<String> modifiableList, int i, int j) {
+        if (b1) {
+            // Keep this comment
+            i++;
+            j++;
+        } else if (b2) {
+            i++;
+            // Keep this comment
+            i++;
+            j++;
+        } else if (modifiableList.remove("foo")) {
             // Keep this comment
             i++;
             j++;
@@ -157,8 +160,8 @@ public class CommonCodeInIfElseStatementSample {
 
     public void refactorMethodInvocatoin(boolean b, Object o) {
         if (b) {
-            o.toString();
             System.out.println(b);
+            o.toString();
         } else {
             o.toString();
         }
@@ -183,18 +186,6 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    public int refactorIfElseInThenClauseNoBrackets(boolean b1, boolean b2) {
-        if (b1)
-            if (b2)
-                return 1;
-        else
-            return 1;
-        return 1;
-        // FIXME
-        // Should be refactored into this unique statement:
-        // return 1;
-    }
-
     public int refactorIfElseInElseClause(boolean b1, boolean b2) {
         if (b1) {
             return 1;
@@ -209,9 +200,17 @@ public class CommonCodeInIfElseStatementSample {
         if (b1)      return 1;
         else if (b2) return 2;
         else         return 2;
-        // FIXME code above should be refactored to:
-        // if (b1)      return 1;
-        // else         return 2;
+    }
+
+    /** common code: i++, Remove if statement */
+    public void ifElseRemoveIfInsideWhile(boolean b, int i) {
+        while (i < 100)
+            if (b) {
+                // Keep this comment
+                i = 1 + i;
+            } else {
+                i++;
+            }
     }
 
     public static Predicate<String> doNotMergeDifferentLambdaExpr(final boolean caseSensitive, final String... allowedSet) {

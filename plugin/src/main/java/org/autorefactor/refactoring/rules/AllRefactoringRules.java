@@ -109,11 +109,13 @@ public final class AllRefactoringRules {
                 new SuperCallRatherThanUselessOverridingRefactoring(),
                 new CollapseIfStatementRefactoring(),
                 new CommonCodeInIfElseStatementRefactoring(),
+                new OppositeConditionRatherThanDuplicateConditionRefactoring(),
                 new MergeConditionalBlocksRefactoring(),
                 new OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring(),
                 new OneCodeThatFallsThroughRatherThanRedundantBlocksRefactoring(),
                 // TODO JNR complete it
                 // new GenerecizeRefactoring(),
+                new GenericListRatherThanRawListRefactoring(),
                 new UseDiamondOperatorRefactoring(),
                 new UseMultiCatchRefactoring(),
                 new CollectionContainsRefactoring(),

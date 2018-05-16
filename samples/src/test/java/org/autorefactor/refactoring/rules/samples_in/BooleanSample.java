@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.List;
+
 public class BooleanSample {
 
     public boolean booleanPrimitive;
@@ -513,7 +515,7 @@ public class BooleanSample {
         aMethodThatAcceptsABoolean(bo ? Boolean.FALSE : Boolean.TRUE);
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression10(boolean bo) {
+    public void directlyPassBooleanPrimitiveAsParameter(boolean bo) {
         // Keep this comment
         if (bo) {
             aMethodThatAcceptsABoolean(true);
@@ -522,12 +524,95 @@ public class BooleanSample {
         }
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression11(boolean bo) {
+    public void directlyPassBooleanExpressionAsParameter(int i) {
+        // Keep this comment
+        if (i > 0) {
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(false);
+        }
+    }
+
+    public void doNotDuplicateExpression(int i) {
+        if (i > 0) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(false);
+        }
+    }
+
+    public void directlyPassInvertedBooleanPrimitiveAsParameter(boolean bo) {
         // Keep this comment
         if (bo) {
             aMethodThatAcceptsABoolean(false);
         } else {
             aMethodThatAcceptsABoolean(true);
+        }
+    }
+
+    public int directlyPassBooleanAmongOtherCode(boolean bo) {
+        // Keep this comment
+        if (bo) {
+            aMethodThatAcceptsABoolean(true);
+            if (aMethodThatReturnsBoolean()) {
+                return 0;
+            } else {
+                return 10;
+            }
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            if (aMethodThatReturnsBoolean())
+                return 0;
+            else
+                return 10;
+        }
+    }
+
+    public int directlyPassBooleanAmongOtherBoolean(boolean bo, int i) {
+        // Keep this comment
+        if (bo) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+            i++;
+        } else {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(true);
+            ++i;
+        }
+        return i;
+    }
+
+    public int directlyPassOppositeBoolean(boolean bo) {
+        // Keep this comment
+        if (bo) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(false);
+            if (aMethodThatReturnsBoolean()) {
+                return 0;
+            } else
+                return 10;
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(true);
+            if (aMethodThatReturnsBoolean())
+                return 0;
+            else {
+                return 10;
+            }
+        }
+    }
+
+    public void doNotMoveActiveExpression(List<Integer> modifiableList) {
+        if (modifiableList.add(1)) {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(false);
         }
     }
 

@@ -129,7 +129,6 @@ import java.util.TreeSet;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -196,6 +195,7 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.QualifiedType;
@@ -336,12 +336,6 @@ public final class ASTHelper {
         }
 
         @Override
-        public boolean visit(PostfixExpression node) {
-            activityLevel = ExprActivity.ACTIVE;
-            return interruptVisit();
-        }
-
-        @Override
         public boolean visit(PrefixExpression node) {
             if (INCREMENT.equals(node.getOperator())
                     || DECREMENT.equals(node.getOperator())) {
@@ -352,34 +346,65 @@ public final class ASTHelper {
         }
 
         @Override
-        public boolean visit(SuperMethodInvocation node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
+        public boolean visit(PostfixExpression node) {
+            activityLevel = ExprActivity.ACTIVE;
+            return interruptVisit();
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean visit(InfixExpression node) {
+            if (InfixExpression.Operator.PLUS.equals(node.getOperator())
+                    && hasType(node, "java.lang.String")
+                    && (mayCallImplicitToString(node.getLeftOperand())
+                            || mayCallImplicitToString(node.getRightOperand())
+                            || mayCallImplicitToString(node.extendedOperands()))) {
                 activityLevel = ExprActivity.CAN_BE_ACTIVE;
             }
+            return VISIT_SUBTREE;
+        }
+
+        private boolean mayCallImplicitToString(List<Expression> extendedOperands) {
+            if (extendedOperands != null) {
+                for (Expression expr : extendedOperands) {
+                    if (mayCallImplicitToString(expr)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private boolean mayCallImplicitToString(Expression expr) {
+            return !hasType(expr, "java.lang.String", "boolean", "short", "int", "long", "float",
+                    "double", "java.lang.Short", "java.lang.Boolean", "java.lang.Integer", "java.lang.Long",
+                    "java.lang.Float", "java.lang.Double")
+                    && !(expr instanceof PrefixExpression)
+                    && !(expr instanceof InfixExpression)
+                    && !(expr instanceof PostfixExpression);
+        }
+
+        @Override
+        public boolean visit(SuperMethodInvocation node) {
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
 
         @Override
         public boolean visit(MethodInvocation node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
-                activityLevel = ExprActivity.CAN_BE_ACTIVE;
-            }
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
-                activityLevel = ExprActivity.CAN_BE_ACTIVE;
-            }
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
 
         @Override
         public boolean visit(ThrowStatement node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
-                activityLevel = ExprActivity.CAN_BE_ACTIVE;
-            }
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
     }
@@ -1120,8 +1145,6 @@ public final class ASTHelper {
     }
 
     /**
-     * TODO Also take into account infix expression.
-     *
      * Returns the type of either a method return or an assigned variable that is the destination of
      * the given node. Returns null otherwise.
      *
@@ -1142,6 +1165,8 @@ public final class ASTHelper {
                         return method.getReturnType2().resolveBinding();
                     }
                 }
+            } else if (parent instanceof CastExpression) {
+                return ((CastExpression) parent).resolveTypeBinding();
             } else if (parent instanceof VariableDeclarationFragment) {
                 return resolveTypeBinding((VariableDeclarationFragment) parent);
             } else if (parent instanceof Assignment) {
@@ -1154,6 +1179,17 @@ public final class ASTHelper {
             } else if (parent instanceof ConditionalExpression) {
                 final ConditionalExpression conditionalExpr = (ConditionalExpression) parent;
                 if (conditionalExpr.getExpression().equals(node)) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof PrefixExpression) {
+                final PrefixExpression prefixExpr = (PrefixExpression) parent;
+                if (Operator.NOT.equals(prefixExpr.getOperator())) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof InfixExpression) {
+                final InfixExpression prefixExpr = (InfixExpression) parent;
+                if (Arrays.asList(InfixExpression.Operator.CONDITIONAL_AND,
+                        InfixExpression.Operator.CONDITIONAL_OR).contains(prefixExpr.getOperator())) {
                     return node.getAST().resolveWellKnownType("boolean");
                 }
             } else if (parent instanceof IfStatement) {
@@ -2095,7 +2131,7 @@ public final class ASTHelper {
             return false;
         }
 
-        final ASTMatcher matcher = new ASTMatcher();
+        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
         for (int codeLine = 0; codeLine < referenceStmts.size(); codeLine++) {
             if (!match(matcher, referenceStmts.get(codeLine),
@@ -2114,7 +2150,7 @@ public final class ASTHelper {
      * @param node2 the second node to compare
      * @return true if the two provided nodes structurally match, false otherwise
      */
-    public static boolean match(ASTMatcher matcher, ASTNode node1, ASTNode node2) {
+    public static boolean match(ASTSemanticMatcher matcher, ASTNode node1, ASTNode node2) {
         if (sameClass(node1, node2)) {
             // FIXME JNR implement all expressions
             // TODO JNR

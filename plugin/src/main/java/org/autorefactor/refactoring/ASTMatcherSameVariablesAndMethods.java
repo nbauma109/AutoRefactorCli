@@ -25,16 +25,15 @@
  */
 package org.autorefactor.refactoring;
 
-import org.eclipse.jdt.core.dom.ASTMatcher;
+import static org.autorefactor.util.Utils.equalNotNull;
+
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 
-import static org.autorefactor.util.Utils.*;
-
 /** Matches two piece of code only if the variables/methods in use are the same. */
-public final class ASTMatcherSameVariablesAndMethods extends ASTMatcher {
+public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher {
     @Override
     public boolean match(SimpleName node, Object other) {
         return super.match(node, other)
@@ -51,9 +50,12 @@ public final class ASTMatcherSameVariablesAndMethods extends ASTMatcher {
             switch (b.getKind()) {
             case IBinding.VARIABLE:
                 return ((IVariableBinding) b).getVariableDeclaration();
+
             case IBinding.METHOD:
                 return ((IMethodBinding) b).getMethodDeclaration();
             }
+
+            return b;
         }
         return null;
     }

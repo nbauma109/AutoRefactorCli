@@ -59,9 +59,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
@@ -127,8 +127,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             Pair.of(RIGHT_SHIFT_SIGNED, AND),
             Pair.of(RIGHT_SHIFT_UNSIGNED, OR),
             Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
-
-    // TODO JNR remove avoidable boxing / unboxing
 
     // TODO Very few parenthesized expressions are actually needed. They are:
     // 1) inside InfixExpressions with logical operators (&&, ||, etc.)
@@ -498,14 +496,14 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             return false;
         } else if (e instanceof InstanceofExpression) {
             final Expression expr = ((InstanceofExpression) e).getLeftOperand();
-            return expr.subtreeMatch(new ASTMatcher(), nullCheckedExpression);
+            return expr.subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression);
         } else if (e instanceof MethodInvocation) {
             final MethodInvocation expr = (MethodInvocation) e;
             if (expr.getExpression() != null
                     && expr.getExpression().resolveConstantExpressionValue() != null
                     && arguments(expr).size() == 1
                     && arguments(expr).get(0).subtreeMatch(
-                            new ASTMatcher(), nullCheckedExpression)) {
+                            new ASTSemanticMatcher(), nullCheckedExpression)) {
                 // Did we invoke java.lang.Object.equals() or java.lang.String.equalsIgnoreCase()?
                 return isMethod(expr, "java.lang.Object", "equals", "java.lang.Object")
                         || isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");

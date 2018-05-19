@@ -105,7 +105,7 @@ public class AutoRefactor implements IApplication {
         final JCommander argParser = JCommander.newBuilder().addObject(args)
                 .addCommand("list", listArgs)
                 .addCommand("apply", applyArgs)
-                .addCommand("apply-dd", applyArgs)
+                .addCommand("apply-dd", applyDDArgs)
                 .addCommand("ast-dump", astDumpArgs)
                 .addCommand("ast-match", astMatchArgs)
                 .addCommand("rename-class", renameClassArgs)

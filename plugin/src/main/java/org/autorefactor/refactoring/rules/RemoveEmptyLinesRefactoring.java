@@ -29,7 +29,7 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.SourceLocation.getEndPosition;
 
-import java.util.NavigableSet;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,7 +79,7 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     }
 
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r\\n|\\n|\\r");
-    private final NavigableSet<Integer> lineEnds = new TreeSet<Integer>();
+    private final TreeSet<Integer> lineEnds = new TreeSet<Integer>();
 
     @Override
     public boolean visit(CompilationUnit node) {
@@ -297,13 +297,13 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     }
 
     private int nextLineEnd(int fromIndex) {
-        final Integer ceiling = lineEnds.higher(fromIndex);
-        return ceiling != null ? ceiling : -1;
+        SortedSet<Integer> higher = lineEnds.tailSet(fromIndex + 1);
+        return higher.isEmpty() ? -1 : higher.first();
     }
 
     private int previousLineEnd(int fromIndex) {
-        final Integer floor = lineEnds.floor(fromIndex);
-        return floor != null ? floor : -1;
+        SortedSet<Integer> lower = lineEnds.headSet(fromIndex + 1);
+        return lower.isEmpty() ? -1 : lower.last();
     }
 
     private int beforeNewlineChars(final String source, int fromIndex) {

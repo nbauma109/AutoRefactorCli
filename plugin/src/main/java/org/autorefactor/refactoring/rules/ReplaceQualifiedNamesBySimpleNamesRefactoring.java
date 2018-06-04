@@ -45,13 +45,13 @@ import static org.eclipse.jdt.core.dom.Modifier.isStatic;
 import static org.eclipse.jdt.core.search.IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH;
 import static org.eclipse.jdt.core.search.SearchEngine.createWorkspaceScope;
 import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
+import static org.autorefactor.util.Utils.equal;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -118,13 +118,14 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 return false;
             }
             QName other = (QName) obj;
-            return Objects.equals(simpleName, other.simpleName)
-                    && Objects.equals(qualifier, other.qualifier);
+            return equal(simpleName, other.simpleName)
+                    && equal(qualifier, other.qualifier);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(simpleName, qualifier);
+            return (simpleName != null ? simpleName.hashCode() : 0) * 1000
+                    + (qualifier != null ? qualifier.hashCode() : 0);
         }
 
         @Override

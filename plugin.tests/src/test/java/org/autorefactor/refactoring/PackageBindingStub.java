@@ -42,6 +42,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return the annotations.
 	 */
+	@Override
 	public IAnnotationBinding[] getAnnotations() {
 		throw new UnsupportedOperationException();
 	}
@@ -51,6 +52,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return the Java element.
 	 */
+	@Override
 	public IJavaElement getJavaElement() {
 		throw new UnsupportedOperationException();
 	}
@@ -60,6 +62,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return the key.
 	 */
+	@Override
 	public String getKey() {
 		throw new UnsupportedOperationException();
 	}
@@ -69,6 +72,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return the kind.
 	 */
+	@Override
 	public int getKind() {
 		throw new UnsupportedOperationException();
 	}
@@ -78,6 +82,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return the modifiers.
 	 */
+	@Override
 	public int getModifiers() {
 		throw new UnsupportedOperationException();
 	}
@@ -87,6 +92,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return True if it is deprecated.
 	 */
+	@Override
 	public boolean isDeprecated() {
 		throw new UnsupportedOperationException();
 	}
@@ -96,6 +102,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return True if it is equal.
 	 */
+	@Override
 	public boolean isEqualTo(IBinding arg0) {
 		throw new UnsupportedOperationException();
 	}
@@ -105,6 +112,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return True if it is recovered.
 	 */
+	@Override
 	public boolean isRecovered() {
 		throw new UnsupportedOperationException();
 	}
@@ -114,10 +122,12 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return True if it is synthetic.
 	 */
+	@Override
 	public boolean isSynthetic() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public String getName() {
 		return packageName;
 	}
@@ -127,6 +137,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return the name components.
 	 */
+	@Override
 	public String[] getNameComponents() {
 		throw new UnsupportedOperationException();
 	}
@@ -136,6 +147,7 @@ class PackageBindingStub implements IPackageBinding {
 	 *
 	 * @return True if it is unnamed.
 	 */
+	@Override
 	public boolean isUnnamed() {
 		throw new UnsupportedOperationException();
 	}

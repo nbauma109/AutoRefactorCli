@@ -39,6 +39,7 @@ class CurrentThreadEventLoop implements EventLoop {
 	 * @throws E the exception possibly returned by executing the callable that is
 	 *           then thrown
 	 */
+	@Override
 	public <E extends Exception> void syncExec(Callable<E> callable) throws E {
 		try {
 			final E ex= callable.call();

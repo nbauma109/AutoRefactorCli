@@ -55,6 +55,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
 	 * @return Clean up fix
 	 * @throws CoreException CoreException
 	 */
+	@Override
 	public ICleanUpFix createFix(CleanUpContext context) throws CoreException {
 		CompilationUnit compilationUnit= context.getAST();
 		if (compilationUnit != null && fOptions.isEnabled(KEY)) {
@@ -69,6 +70,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
 	 *
 	 * @return Clean up requirements
 	 */
+	@Override
 	public CleanUpRequirements getRequirements() {
 		return new CleanUpRequirements(true, true, true, new HashMap<String, String>());
 	}
@@ -78,6 +80,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
 	 *
 	 * @return The step descriptions.
 	 */
+	@Override
 	public String[] getStepDescriptions() {
 		if (fOptions.isEnabled(KEY)) {
 			return new String[] { "AutoRefactor (only 1 pass)" }; //$NON-NLS-1$
@@ -91,6 +94,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
 	 *
 	 * @param options options
 	 */
+	@Override
 	public void setOptions(CleanUpOptions options) {
 		Assert.isLegal(options != null);
 		Assert.isTrue(fOptions == null);
@@ -106,6 +110,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
 	 * @return Cleanup status
 	 * @throws CoreException CoreException
 	 */
+	@Override
 	public RefactoringStatus checkPreConditions(IJavaProject project, ICompilationUnit[] compilationUnits,
 			IProgressMonitor monitor) throws CoreException {
 		if (fOptions.isEnabled(KEY)) {
@@ -122,6 +127,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
 	 * @return Cleanup Status
 	 * @throws CoreException CoreException
 	 */
+	@Override
 	public RefactoringStatus checkPostConditions(IProgressMonitor monitor) throws CoreException {
 		try {
 			if (fStatus == null || fStatus.isOK()) {

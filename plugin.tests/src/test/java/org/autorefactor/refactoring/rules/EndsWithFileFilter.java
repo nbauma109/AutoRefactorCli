@@ -36,6 +36,7 @@ public class EndsWithFileFilter implements FileFilter {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public boolean accept(File file) {
 		return file.getName().endsWith(nameEnd) && file.exists() && file.isFile();
 	}

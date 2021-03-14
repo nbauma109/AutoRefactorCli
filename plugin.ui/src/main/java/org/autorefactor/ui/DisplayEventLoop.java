@@ -44,6 +44,7 @@ public class DisplayEventLoop implements EventLoop {
 	 * @throws E the exception possibly returned by executing the callable that is
 	 *           then thrown
 	 */
+	@Override
 	public <E extends Exception> void syncExec(final Callable<E> call) throws E {
 		final FutureTask<E> future= new FutureTask<>(call);
 		Display.getDefault().syncExec(future);

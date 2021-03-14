@@ -79,6 +79,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the annotations.
 	 */
+	@Override
 	public IAnnotationBinding[] getAnnotations() {
 		throw new UnsupportedOperationException();
 	}
@@ -88,6 +89,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the Java element.
 	 */
+	@Override
 	public IJavaElement getJavaElement() {
 		throw new UnsupportedOperationException();
 	}
@@ -97,6 +99,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the key.
 	 */
+	@Override
 	public String getKey() {
 		throw new UnsupportedOperationException();
 	}
@@ -106,6 +109,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the kind.
 	 */
+	@Override
 	public int getKind() {
 		throw new UnsupportedOperationException();
 	}
@@ -115,6 +119,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is deprecated.
 	 */
+	@Override
 	public boolean isDeprecated() {
 		throw new UnsupportedOperationException();
 	}
@@ -124,6 +129,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is equal.
 	 */
+	@Override
 	public boolean isEqualTo(IBinding arg0) {
 		throw new UnsupportedOperationException();
 	}
@@ -133,6 +139,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is recovered.
 	 */
+	@Override
 	public boolean isRecovered() {
 		throw new UnsupportedOperationException();
 	}
@@ -142,6 +149,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is synthetic.
 	 */
+	@Override
 	public boolean isSynthetic() {
 		throw new UnsupportedOperationException();
 	}
@@ -151,6 +159,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the array type.
 	 */
+	@Override
 	public ITypeBinding createArrayType(int arg0) {
 		throw new UnsupportedOperationException();
 	}
@@ -160,6 +169,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the binary name.
 	 */
+	@Override
 	public String getBinaryName() {
 		throw new UnsupportedOperationException();
 	}
@@ -169,6 +179,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the bound.
 	 */
+	@Override
 	public ITypeBinding getBound() {
 		throw new UnsupportedOperationException();
 	}
@@ -178,6 +189,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the component type.
 	 */
+	@Override
 	public ITypeBinding getComponentType() {
 		throw new UnsupportedOperationException();
 	}
@@ -187,6 +199,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the declared fields.
 	 */
+	@Override
 	public IVariableBinding[] getDeclaredFields() {
 		throw new UnsupportedOperationException();
 	}
@@ -196,6 +209,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the declared methods.
 	 */
+	@Override
 	public IMethodBinding[] getDeclaredMethods() {
 		throw new UnsupportedOperationException();
 	}
@@ -205,6 +219,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the declared modifiers.
 	 */
+	@Override
 	public int getDeclaredModifiers() {
 		throw new UnsupportedOperationException();
 	}
@@ -214,6 +229,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the declared types.
 	 */
+	@Override
 	public ITypeBinding[] getDeclaredTypes() {
 		throw new UnsupportedOperationException();
 	}
@@ -223,10 +239,12 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the declared class.
 	 */
+	@Override
 	public ITypeBinding getDeclaringClass() {
 		return declaringClass;
 	}
 
+	@Override
 	public IBinding getDeclaringMember() {
 		throw new UnsupportedOperationException();
 	}
@@ -236,6 +254,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the declaring method.
 	 */
+	@Override
 	public IMethodBinding getDeclaringMethod() {
 		throw new UnsupportedOperationException();
 	}
@@ -245,6 +264,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the dimensions.
 	 */
+	@Override
 	public int getDimensions() {
 		throw new UnsupportedOperationException();
 	}
@@ -254,6 +274,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the element type.
 	 */
+	@Override
 	public ITypeBinding getElementType() {
 		throw new UnsupportedOperationException();
 	}
@@ -263,10 +284,12 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the erasure.
 	 */
+	@Override
 	public ITypeBinding getErasure() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public IMethodBinding getFunctionalInterfaceMethod() {
 		throw new UnsupportedOperationException();
 	}
@@ -276,6 +299,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the generic type of wildcard type.
 	 */
+	@Override
 	public ITypeBinding getGenericTypeOfWildcardType() {
 		throw new UnsupportedOperationException();
 	}
@@ -285,6 +309,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the interfaces.
 	 */
+	@Override
 	public ITypeBinding[] getInterfaces() {
 		throw new UnsupportedOperationException();
 	}
@@ -294,6 +319,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the modifiers.
 	 */
+	@Override
 	public int getModifiers() {
 		throw new UnsupportedOperationException();
 	}
@@ -303,6 +329,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the name.
 	 */
+	@Override
 	public String getName() {
 		throw new UnsupportedOperationException();
 	}
@@ -312,6 +339,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the package.
 	 */
+	@Override
 	public IPackageBinding getPackage() {
 		return packageBinding;
 	}
@@ -321,6 +349,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the fully qualified name.
 	 */
+	@Override
 	public String getQualifiedName() {
 		return fullyQualifiedName;
 	}
@@ -330,6 +359,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the rank.
 	 */
+	@Override
 	public int getRank() {
 		throw new UnsupportedOperationException();
 	}
@@ -339,10 +369,12 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the superclass.
 	 */
+	@Override
 	public ITypeBinding getSuperclass() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public IAnnotationBinding[] getTypeAnnotations() {
 		throw new UnsupportedOperationException();
 	}
@@ -352,6 +384,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the type arguments.
 	 */
+	@Override
 	public ITypeBinding[] getTypeArguments() {
 		throw new UnsupportedOperationException();
 	}
@@ -361,6 +394,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the type bounds.
 	 */
+	@Override
 	public ITypeBinding[] getTypeBounds() {
 		throw new UnsupportedOperationException();
 	}
@@ -370,6 +404,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the type declaration.
 	 */
+	@Override
 	public ITypeBinding getTypeDeclaration() {
 		throw new UnsupportedOperationException();
 	}
@@ -379,6 +414,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the fully qualified name.
 	 */
+	@Override
 	public ITypeBinding[] getTypeParameters() {
 		throw new UnsupportedOperationException();
 	}
@@ -388,6 +424,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return the wildcard.
 	 */
+	@Override
 	public ITypeBinding getWildcard() {
 		throw new UnsupportedOperationException();
 	}
@@ -397,6 +434,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is an annotation.
 	 */
+	@Override
 	public boolean isAnnotation() {
 		throw new UnsupportedOperationException();
 	}
@@ -406,6 +444,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is anonymous.
 	 */
+	@Override
 	public boolean isAnonymous() {
 		throw new UnsupportedOperationException();
 	}
@@ -415,6 +454,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is an array.
 	 */
+	@Override
 	public boolean isArray() {
 		throw new UnsupportedOperationException();
 	}
@@ -424,6 +464,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is assignment compatible.
 	 */
+	@Override
 	public boolean isAssignmentCompatible(ITypeBinding arg0) {
 		throw new UnsupportedOperationException();
 	}
@@ -433,6 +474,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is capture.
 	 */
+	@Override
 	public boolean isCapture() {
 		throw new UnsupportedOperationException();
 	}
@@ -442,6 +484,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is cast compatible.
 	 */
+	@Override
 	public boolean isCastCompatible(ITypeBinding arg0) {
 		throw new UnsupportedOperationException();
 	}
@@ -451,6 +494,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is class.
 	 */
+	@Override
 	public boolean isClass() {
 		throw new UnsupportedOperationException();
 	}
@@ -460,6 +504,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is enum.
 	 */
+	@Override
 	public boolean isEnum() {
 		throw new UnsupportedOperationException();
 	}
@@ -469,6 +514,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is from source.
 	 */
+	@Override
 	public boolean isFromSource() {
 		throw new UnsupportedOperationException();
 	}
@@ -478,6 +524,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is generic type.
 	 */
+	@Override
 	public boolean isGenericType() {
 		throw new UnsupportedOperationException();
 	}
@@ -487,6 +534,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is interface.
 	 */
+	@Override
 	public boolean isInterface() {
 		throw new UnsupportedOperationException();
 	}
@@ -496,6 +544,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is local.
 	 */
+	@Override
 	public boolean isLocal() {
 		throw new UnsupportedOperationException();
 	}
@@ -505,6 +554,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is member.
 	 */
+	@Override
 	public boolean isMember() {
 		throw new UnsupportedOperationException();
 	}
@@ -514,6 +564,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is nested.
 	 */
+	@Override
 	public boolean isNested() {
 		throw new UnsupportedOperationException();
 	}
@@ -523,6 +574,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is null type.
 	 */
+	@Override
 	public boolean isNullType() {
 		throw new UnsupportedOperationException();
 	}
@@ -532,6 +584,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is parameterized type.
 	 */
+	@Override
 	public boolean isParameterizedType() {
 		throw new UnsupportedOperationException();
 	}
@@ -541,6 +594,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is primitive.
 	 */
+	@Override
 	public boolean isPrimitive() {
 		throw new UnsupportedOperationException();
 	}
@@ -550,6 +604,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is raw type.
 	 */
+	@Override
 	public boolean isRawType() {
 		throw new UnsupportedOperationException();
 	}
@@ -559,6 +614,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is sub type compatible.
 	 */
+	@Override
 	public boolean isSubTypeCompatible(ITypeBinding arg0) {
 		throw new UnsupportedOperationException();
 	}
@@ -568,6 +624,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is top level.
 	 */
+	@Override
 	public boolean isTopLevel() {
 		throw new UnsupportedOperationException();
 	}
@@ -577,6 +634,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is type variable.
 	 */
+	@Override
 	public boolean isTypeVariable() {
 		throw new UnsupportedOperationException();
 	}
@@ -586,6 +644,7 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is upperbound.
 	 */
+	@Override
 	public boolean isUpperbound() {
 		throw new UnsupportedOperationException();
 	}
@@ -595,10 +654,12 @@ class TypeBindingStub implements ITypeBinding {
 	 *
 	 * @return True if it is unnamed.
 	 */
+	@Override
 	public boolean isWildcardType() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean isIntersectionType() {
 		throw new UnsupportedOperationException();
 	}
@@ -608,6 +669,7 @@ class TypeBindingStub implements ITypeBinding {
 		return fullyQualifiedName;
 	}
 
+	@Override
 	public boolean isRecord() {
 		return false;
 	}

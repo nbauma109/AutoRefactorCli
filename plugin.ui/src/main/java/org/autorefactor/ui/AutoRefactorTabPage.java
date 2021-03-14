@@ -200,6 +200,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
 	 *
 	 * @return String
 	 */
+	@Override
 	public String getPreview() {
 		return "// no preview"; //$NON-NLS-1$
 	}
@@ -229,6 +230,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
 	 *
 	 * @param options options
 	 */
+	@Override
 	public void setOptions(CleanUpOptions options) {
 		if (fields != null) {
 			for (FieldEditor field : fields) {

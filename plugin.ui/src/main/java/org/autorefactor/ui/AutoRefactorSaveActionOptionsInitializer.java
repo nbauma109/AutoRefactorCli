@@ -35,6 +35,7 @@ public class AutoRefactorSaveActionOptionsInitializer implements ICleanUpOptions
 	 *
 	 * @param options options
 	 */
+	@Override
 	public void setDefaultOptions(CleanUpOptions options) {
 		options.setOption("org.autorefactor.ui.autorefactor_clean_up", CleanUpOptions.FALSE); //$NON-NLS-1$
 	}

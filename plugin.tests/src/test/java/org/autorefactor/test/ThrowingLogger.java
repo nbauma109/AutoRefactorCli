@@ -34,6 +34,7 @@ class ThrowingLogger implements Logger {
 	 *
 	 * @param message the message
 	 */
+	@Override
 	public void error(String message) {
 		throw new RuntimeException(message);
 	}
@@ -44,6 +45,7 @@ class ThrowingLogger implements Logger {
 	 * @param message the message
 	 * @param e       the exception
 	 */
+	@Override
 	public void error(String message, Exception e) {
 		if (e instanceof RuntimeException) {
 			throw (RuntimeException) e;
@@ -56,6 +58,7 @@ class ThrowingLogger implements Logger {
 	 *
 	 * @param message the message
 	 */
+	@Override
 	public void warn(String message) {
 		throw new RuntimeException(message);
 	}

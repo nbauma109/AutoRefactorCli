@@ -16,7 +16,7 @@ mvn clean package
 rm -rf cli/target/autorefactor
 mkdir -p cli/target/autorefactor/bin cli/target/autorefactor/dropins/plugins
 #cp ./plugin/target/org.autorefactor.plugin-1.1.0-SNAPSHOT.jar ./plugin.ui/target/org.autorefactor.plugin.ui-1.1.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-1.1.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
-cp ./plugin/target/org.autorefactor.plugin-2.0.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-2.0.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
+cp ./plugin/target/org.autorefactor.plugin-1.2.0-SNAPSHOT.jar ./cli/target/org.autorefactor.cli-1.2.0-SNAPSHOT.jar cli/target/autorefactor/dropins/plugins
 cp ${DIR}/cli/src/main/resources/autorefactor.sh cli/target/autorefactor/bin/autorefactor
 chmod +x cli/target/autorefactor/bin/autorefactor
 cat << EOD
